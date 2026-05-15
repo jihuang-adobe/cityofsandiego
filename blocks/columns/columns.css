@@ -1,16 +1,25 @@
 .columns {
-  --columns-gap: 0;
+  --columns-gap: 2rem;
 
   display: grid;
   gap: var(--columns-gap);
+  color: #000;
+  padding: 0 1rem;
+  box-sizing: border-box;
 
   img {
     display: block;
   }
 
+  &.align-vertically {
+    .row {
+      align-items: center;
+    }
+  }
+
   .row {
     display: grid;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--columns-gap);
   }
 

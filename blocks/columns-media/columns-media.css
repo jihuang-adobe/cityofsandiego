@@ -1,0 +1,138 @@
+.columns-media {
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-m);
+    align-items: stretch;
+
+    > div:first-child {
+      flex: 1;
+      width: 100%;
+    }
+
+    > div:last-child {
+      flex: 1;
+      align-self: center;
+    }
+  }
+
+  h2 {
+    font-size: var(--heading-font-size-xl);
+    font-weight: 600;
+    margin-top: 0;
+    color: var(--color-navy);
+  }
+
+  p {
+    font-size: var(--body-font-size-m);
+    line-height: 1.5;
+    color: var(--color-grey-text);
+  }
+
+  a:any-link {
+    color: var(--color-link);
+  }
+}
+
+/* Video / embed column */
+.columns-media-media-col {
+  width: 100%;
+}
+
+.columns-media-video {
+  width: 100%;
+}
+
+.columns-media-embed-ratio {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-navy);
+}
+
+.columns-media-embed-inner {
+  position: absolute;
+  inset: 0;
+}
+
+.columns-media-embed-ratio--poster picture,
+.columns-media-embed-ratio--poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.columns-media-embed-ratio video,
+.columns-media-iframe {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.columns-media-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(13 28 61 / 28%);
+}
+
+.columns-media-play {
+  box-sizing: border-box;
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: rgb(13 28 61 / 72%);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: rgb(13 28 61 / 88%);
+    transform: scale(1.04);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 3px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 3px);
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 14px 0 14px 22px;
+    border-color: transparent transparent transparent var(--color-white);
+  }
+}
+
+@media (width >= 900px) {
+  .columns-media {
+    > div {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--spacing-l);
+
+      > div:first-child {
+        flex: 1;
+      }
+
+      > div:last-child {
+        flex: 1;
+      }
+    }
+  }
+}

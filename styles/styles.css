@@ -274,7 +274,7 @@
 
   /* KP semantic overrides */
   color-scheme: light;
-  --color-text: var(--color-navy);
+  --color-text: #000;
   --color-link: var(--color-blue-accent);
   --color-link-hover: #005a87;
   --color-background: var(--color-white);
