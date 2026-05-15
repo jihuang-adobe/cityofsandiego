@@ -1,15 +1,12 @@
 import { getConfig, getMetadata } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
-import { setColorScheme } from '../section-metadata/section-metadata.js';
 
 const { locale } = getConfig();
 
 const HEADER_PATH = '/fragments/nav/header';
-const HEADER_ACTIONS = [
-  '/tools/widgets/scheme',
-  '/tools/widgets/language',
-  '/tools/widgets/toggle',
-];
+const isDesktop = window.matchMedia('(min-width: 900px)');
+
+// ── Dropdown toggle system (language picker) ──
 
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
@@ -23,58 +20,40 @@ function docClose(e) {
   closeAllMenus();
 }
 
-function toggleMenu(menu) {
+function toggleDropdown(menu) {
   const isOpen = menu.classList.contains('is-open');
   closeAllMenus();
   if (isOpen) {
     document.removeEventListener('click', docClose);
     return;
   }
-
-  // Setup the global close event
   document.addEventListener('click', docClose);
   menu.classList.add('is-open');
 }
 
 function decorateLanguage(btn) {
   const section = btn.closest('.section');
+  let blockContent = null;
+
   btn.addEventListener('click', async () => {
-    let menu = section.querySelector('.language.menu');
-    if (!menu) {
-      const content = document.createElement('div');
-      content.classList.add('block-content');
-      const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
-      menu = document.createElement('div');
+    if (!blockContent) {
+      // Build and show the dropdown immediately, then load content into it
+      blockContent = document.createElement('div');
+      blockContent.classList.add('block-content');
+      const menu = document.createElement('div');
       menu.className = 'language menu';
-      menu.append(fragment);
-      content.append(menu);
-      section.append(content);
-    }
-    toggleMenu(section);
-  });
-}
-
-function decorateScheme(btn) {
-  btn.addEventListener('click', async () => {
-    const { body } = document;
-
-    let currPref = localStorage.getItem('color-scheme');
-    if (!currPref) {
-      currPref = matchMedia('(prefers-color-scheme: dark)')
-        .matches ? 'dark-scheme' : 'light-scheme';
-    }
-
-    const theme = currPref === 'dark-scheme'
-      ? { add: 'light-scheme', remove: 'dark-scheme' }
-      : { add: 'dark-scheme', remove: 'light-scheme' };
-
-    body.classList.remove(theme.remove);
-    body.classList.add(theme.add);
-    localStorage.setItem('color-scheme', theme.add);
-    // Re-calculatie section schemes
-    const sections = document.querySelectorAll('.section');
-    for (const section of sections) {
-      setColorScheme(section);
+      blockContent.append(menu);
+      section.append(blockContent);
+      toggleDropdown(section);
+      try {
+        const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
+        if (fragment) menu.append(fragment);
+      } catch (e) {
+        blockContent.remove();
+        blockContent = null;
+      }
+    } else {
+      toggleDropdown(section);
     }
   });
 }
@@ -86,12 +65,85 @@ function decorateNavToggle(btn) {
   });
 }
 
-async function decorateAction(header, pattern) {
-  const link = header.querySelector(`[href*="${pattern}"]`);
+// ── Mobile nav system (KP) ──
+
+function closeOnEscape(e) {
+  if (e.code === 'Escape') {
+    const nav = document.getElementById('nav');
+    const navSections = nav.querySelector('.nav-sections');
+    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    if (navSectionExpanded && isDesktop.matches) {
+      // eslint-disable-next-line no-use-before-define
+      toggleAllNavSections(navSections);
+      navSectionExpanded.focus();
+    } else if (!isDesktop.matches) {
+      // eslint-disable-next-line no-use-before-define
+      toggleMobileNav(nav, navSections);
+      nav.querySelector('button').focus();
+    }
+  }
+}
+
+function closeOnFocusLost(e) {
+  const nav = e.currentTarget;
+  if (!nav.contains(e.relatedTarget)) {
+    const navSections = nav.querySelector('.nav-sections');
+    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    if (navSectionExpanded && isDesktop.matches) {
+      // eslint-disable-next-line no-use-before-define
+      toggleAllNavSections(navSections, false);
+    } else if (!isDesktop.matches) {
+      // eslint-disable-next-line no-use-before-define
+      toggleMobileNav(nav, navSections, false);
+    }
+  }
+}
+
+function toggleAllNavSections(sections, expanded = false) {
+  sections.querySelectorAll(':scope .default-content > ul > li').forEach((section) => {
+    section.setAttribute('aria-expanded', expanded);
+  });
+}
+
+function toggleMobileNav(nav, navSections, forceExpanded = null) {
+  const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
+  const button = nav.querySelector('.nav-hamburger button');
+  const hamburgerLabel = nav.querySelector('.nav-hamburger-label');
+  document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
+  nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
+  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  const menuOpen = nav.getAttribute('aria-expanded') === 'true';
+  if (hamburgerLabel) hamburgerLabel.textContent = menuOpen ? 'Close' : 'Menu';
+
+  const navDrops = navSections.querySelectorAll('.nav-drop');
+  if (isDesktop.matches) {
+    navDrops.forEach((drop) => {
+      if (!drop.hasAttribute('tabindex')) {
+        drop.setAttribute('tabindex', 0);
+      }
+    });
+  } else {
+    navDrops.forEach((drop) => drop.removeAttribute('tabindex'));
+  }
+
+  if (!expanded || isDesktop.matches) {
+    window.addEventListener('keydown', closeOnEscape);
+    nav.addEventListener('focusout', closeOnFocusLost);
+  } else {
+    window.removeEventListener('keydown', closeOnEscape);
+    nav.removeEventListener('focusout', closeOnFocusLost);
+  }
+}
+
+// ── Action decoration ──
+
+async function decorateAction(container, pattern) {
+  const link = container.querySelector(`[href*="${pattern}"]`);
   if (!link) return;
 
   const icon = link.querySelector('.icon');
-  const text = link.textContent;
+  const text = link.textContent.trim();
   const btn = document.createElement('button');
   if (icon) btn.append(icon);
   if (text) {
@@ -100,98 +152,147 @@ async function decorateAction(header, pattern) {
     textSpan.textContent = text;
     btn.append(textSpan);
   }
+
   const wrapper = document.createElement('div');
-  wrapper.className = `action-wrapper ${icon.classList[1].replace('icon-', '')}`;
+  const iconClass = icon ? icon.classList[1]?.replace('icon-', '') : 'action';
+  wrapper.className = `action-wrapper ${iconClass}`;
   wrapper.append(btn);
   link.parentElement.parentElement.replaceChild(wrapper, link.parentElement);
 
   if (pattern === '/tools/widgets/language') decorateLanguage(btn);
-  if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
 }
 
-function decorateMenu() {
-  // TODO: finish single menu support
-  return null;
+// ── Breadcrumbs (KP) ──
+
+function getDirectTextContent(menuItem) {
+  const menuLink = menuItem.querySelector(':scope > a');
+  if (menuLink) return menuLink.textContent.trim();
+  return Array.from(menuItem.childNodes)
+    .filter((n) => n.nodeType === Node.TEXT_NODE)
+    .map((n) => n.textContent)
+    .join(' ');
 }
 
-function decorateMegaMenu(li) {
-  const menu = li.querySelector('.fragment-content');
-  if (!menu) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'mega-menu';
-  wrapper.append(menu);
-  li.append(wrapper);
-  return wrapper;
-}
+async function buildBreadcrumbsFromNavTree(navEl, currentUrl) {
+  const crumbs = [];
+  const homeUrl = document.querySelector('.nav-brand a[href]')?.href;
 
-function decorateNavItem(li) {
-  li.classList.add('main-nav-item');
-  const link = li.querySelector(':scope > p > a');
-  if (link) link.classList.add('main-nav-link');
-  const menu = decorateMegaMenu(li) || decorateMenu(li);
-  if (!(menu || link)) return;
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    toggleMenu(li);
-  });
-}
-
-function decorateBrandSection(section) {
-  section.classList.add('brand-section');
-  const brandLink = section.querySelector('a');
-  const [, text] = brandLink.childNodes;
-  const span = document.createElement('span');
-  span.className = 'brand-text';
-  span.append(text);
-  brandLink.append(span);
-}
-
-function decorateNavSection(section) {
-  section.classList.add('main-nav-section');
-  const navContent = section.querySelector('.default-content');
-  const navList = section.querySelector('ul');
-  if (!navList) return;
-  navList.classList.add('main-nav-list');
-
-  const nav = document.createElement('nav');
-  nav.append(navList);
-  navContent.append(nav);
-
-  const mainNavItems = section.querySelectorAll('nav > ul > li');
-  for (const navItem of mainNavItems) {
-    decorateNavItem(navItem);
+  let menuItem = Array.from(navEl.querySelectorAll('a')).find((a) => a.href === currentUrl);
+  if (menuItem) {
+    do {
+      const link = menuItem.querySelector(':scope > a');
+      crumbs.unshift({ title: getDirectTextContent(menuItem), url: link ? link.href : null });
+      menuItem = menuItem.closest('ul')?.closest('li');
+    } while (menuItem);
+  } else if (currentUrl !== homeUrl) {
+    crumbs.unshift({ title: getMetadata('og:title'), url: currentUrl });
   }
+
+  crumbs.unshift({ title: 'Home', url: homeUrl });
+
+  if (crumbs.length > 1) crumbs[crumbs.length - 1].url = null;
+  crumbs[crumbs.length - 1]['aria-current'] = 'page';
+  return crumbs;
 }
 
-async function decorateActionSection(section) {
-  section.classList.add('actions-section');
+async function buildBreadcrumbs() {
+  const breadcrumbs = document.createElement('nav');
+  breadcrumbs.className = 'breadcrumbs';
+
+  const crumbs = await buildBreadcrumbsFromNavTree(
+    document.querySelector('.nav-sections'),
+    document.location.href,
+  );
+
+  const ol = document.createElement('ol');
+  ol.append(...crumbs.map((item) => {
+    const li = document.createElement('li');
+    if (item['aria-current']) li.setAttribute('aria-current', item['aria-current']);
+    if (item.url) {
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.textContent = item.title;
+      li.append(a);
+    } else {
+      li.textContent = item.title;
+    }
+    return li;
+  }));
+
+  breadcrumbs.append(ol);
+  return breadcrumbs;
 }
 
-async function decorateHeader(fragment) {
-  const sections = fragment.querySelectorAll(':scope > .section');
-  if (sections[0]) decorateBrandSection(sections[0]);
-  if (sections[1]) decorateNavSection(sections[1]);
-  if (sections[2]) decorateActionSection(sections[2]);
+// ── Init ──
 
-  for (const pattern of HEADER_ACTIONS) {
-    decorateAction(fragment, pattern);
-  }
-}
-
-/**
- * loads and decorates the header
- * @param {Element} el The header element
- */
 export default async function init(el) {
   const headerMeta = getMetadata('header');
-  const path = headerMeta || HEADER_PATH;
-  try {
-    const fragment = await loadFragment(`${locale.prefix}${path}`);
-    fragment.classList.add('header-content');
-    await decorateHeader(fragment);
-    el.append(fragment);
-  } catch (e) {
-    throw Error(e);
+  const navPath = headerMeta || HEADER_PATH;
+
+  const fragment = await loadFragment(`${locale.prefix}${navPath}`);
+
+  el.textContent = '';
+  const nav = document.createElement('nav');
+  nav.id = 'nav';
+  while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
+
+  // Apply KP section classes (brand = utility bar, sections = logo bar, tools = nav links)
+  const classes = ['brand', 'sections', 'tools'];
+  classes.forEach((c, i) => {
+    const section = nav.children[i];
+    if (section) section.classList.add(`nav-${c}`);
+  });
+
+  // nav-brand (section 1): external links + language toggle + nav toggle
+  const navBrand = nav.querySelector('.nav-brand');
+  if (navBrand) {
+    navBrand.querySelectorAll('a[href]').forEach((a) => {
+      const href = a.getAttribute('href') || '';
+      if (/^https?:\/\//i.test(href)) {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+      }
+    });
+    await decorateAction(navBrand, '/tools/widgets/language');
+    await decorateAction(navBrand, '/tools/widgets/toggle');
+  }
+
+  // nav-sections (section 2): add hamburger for mobile
+  const navSections = nav.querySelector('.nav-sections');
+  if (navSections) {
+    navSections.querySelectorAll(':scope .default-content > ul > li').forEach((navSection) => {
+      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      navSection.addEventListener('click', () => {
+        if (isDesktop.matches) {
+          const expanded = navSection.getAttribute('aria-expanded') === 'true';
+          toggleAllNavSections(navSections);
+          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        }
+      });
+    });
+
+    const hamburger = document.createElement('div');
+    hamburger.classList.add('nav-hamburger');
+    hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
+        <span class="nav-hamburger-icon"></span>
+      </button>
+      <span class="nav-hamburger-label" aria-hidden="true">Menu</span>`;
+    hamburger.addEventListener('click', () => toggleMobileNav(nav, navSections));
+    const sectionsInner = navSections.querySelector('.default-content');
+    if (sectionsInner) sectionsInner.append(hamburger);
+  }
+
+  nav.setAttribute('aria-expanded', 'false');
+  toggleMobileNav(nav, navSections, isDesktop.matches);
+  isDesktop.addEventListener('change', () => toggleMobileNav(nav, navSections, isDesktop.matches));
+
+  const navWrapper = document.createElement('div');
+  navWrapper.className = 'nav-wrapper';
+  navWrapper.append(nav);
+  el.append(navWrapper);
+
+  if (getMetadata('breadcrumbs')?.toLowerCase() === 'true') {
+    navWrapper.append(await buildBreadcrumbs());
   }
 }
