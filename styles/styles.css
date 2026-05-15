@@ -775,9 +775,9 @@ main .section.footnotes {
   margin: 0 1rem;
 }
 
-main .section.footnotes > div {
+main .section.footnotes > div.default-content {
   border-top: 6px solid #c4cdd6;
-  padding: 0 1rem;
+  padding: 1rem 0 !important;
 }
 
 @media (width >= 900px) {
