@@ -1,6 +1,4 @@
-.columns-media {
-  padding: 0 1rem;
-  
+.columns-media {  
   > div {
     display: flex;
     flex-direction: column;
