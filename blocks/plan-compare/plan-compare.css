@@ -1,0 +1,74 @@
+.plan-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .plan-compare-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .plan-compare-col-heading {
+    text-align: center;
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-l);
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 4px;
+  }
+
+  .plan-compare-card {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+
+    strong,
+    b {
+      display: block;
+      font-family: var(--heading-font-family);
+      font-size: var(--heading-font-size-s);
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      font-size: var(--body-font-size-m);
+      line-height: 1.6;
+      color: var(--color-text);
+      margin-bottom: 6px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (width >= 900px) {
+  .plan-compare {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 24px;
+    row-gap: 0;
+
+    .plan-compare-col {
+      grid-row: 1 / -1;
+      display: grid;
+      grid-template-rows: subgrid;
+      gap: 16px;
+    }
+
+    .plan-compare-card {
+      align-self: stretch;
+    }
+  }
+}
