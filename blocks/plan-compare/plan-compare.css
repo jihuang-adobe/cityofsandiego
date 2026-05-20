@@ -15,7 +15,8 @@
     font-size: var(--heading-font-size-l);
     font-weight: 700;
     color: var(--color-navy);
-    margin: 0 0 4px;
+    margin: 0;
+    padding: 1rem 0;
   }
 
   .plan-compare-card {

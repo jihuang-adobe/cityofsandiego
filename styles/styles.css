@@ -560,9 +560,16 @@ a.button:not(.primary, .secondary):focus {
   border-color: transparent;
 }
 
-/* sections */
+/* ==========================================================================
+   SECTIONS — Base layout and spacing
+   ========================================================================== */
+
 .section {
   display: block;
+
+  /* Internal layout tokens — overridable by section metadata classes */
+  --bottom-spacing: 1.5rem;
+  --section-container-width: var(--grid-container-width);
 
   > div {
     max-width: var(--content-max-width);
@@ -572,6 +579,11 @@ a.button:not(.primary, .secondary):focus {
   > .default-content {
     padding: 0 24px;
     box-sizing: border-box;
+    margin-top: 1rem;
+    margin-bottom: var(--bottom-spacing);
+
+    > *:first-child { margin-top: 0; }
+    > *:last-child  { margin-bottom: 0; }
   }
 }
 
@@ -725,20 +737,225 @@ main .section .block-content {
   padding: 0 1rem;
 }
 
-/* section variants */
+/* ==========================================================================
+   SECTION METADATA
+   ============================================================================
+   Section metadata is authored as a two-column table at the bottom of a
+   content section in the document. The server-side pre-renderer reads each
+   row and applies it to the wrapping <div class="section"> element using
+   two different conventions depending on the key:
+
+     "style" key  → values added as CSS classes
+     all other keys → added as data-attributes (data-{key}="{value}")
+
+   Example table in a document:
+     | style      | center    |   → class="center"          (.section.center)
+     | style      | pale-blue |   → class="pale-blue"       (.section.pale-blue)
+     | spacing    | xl        |   → data-spacing="xl"       ([data-spacing="xl"])
+     | grid       | 3         |   → data-grid="3"           ([data-grid="3"])
+     | gap        | m         |   → data-gap="m"            ([data-gap="m"])
+     | container  | 4         |   → data-container="4"      ([data-container="4"])
+     | layout     | bento     |   → data-layout="bento"     ([data-layout="bento"])
+     | background | /img.png  |   → data-background=…  + class="has-background"
+
+   To add a new variant: pick a key, define the selector below, and document
+   it in the comment for the relevant group.
+   ========================================================================== */
+
+/* --- Spacing ---------------------------------------------------------------
+   Key: spacing  |  Values: xs · s · m · l · xl · xxl
+   Overrides the default section padding symmetrically (top + bottom).
+   --------------------------------------------------------------------------- */
+main > .section[data-spacing="xs"]  { padding: calc(var(--spacing-xs) * 2)  0; }
+main > .section[data-spacing="s"]   { padding: calc(var(--spacing-s) * 2)   0; }
+main > .section[data-spacing="m"]   { padding: calc(var(--spacing-m) * 2)   0; }
+main > .section[data-spacing="l"]   { padding: calc(var(--spacing-l) * 2)   0; }
+main > .section[data-spacing="xl"]  { padding: calc(var(--spacing-xl) * 2)  0; }
+main > .section[data-spacing="xxl"] { padding: calc(var(--spacing-xxl) * 2) 0; }
+
+/* --- Grid ------------------------------------------------------------------
+   Key: grid  |  Values: 2 · 3 · 4 · 5 · 6
+   Sets the number of columns for block-content children. Pair with gap.
+   Columns collapse on mobile and expand at breakpoints (see below).
+   --------------------------------------------------------------------------- */
+.section[data-grid="2"] { --grid-size: 2; }
+.section[data-grid="3"] { --grid-size: 3; }
+.section[data-grid="4"] { --grid-size: 4; }
+.section[data-grid="5"] { --grid-size: 5; }
+.section[data-grid="6"] { --grid-size: 6; }
+
+.section[data-grid] .block-content {
+  display: grid;
+  gap: var(--gap-spacing);
+}
+
+/* --- Gap -------------------------------------------------------------------
+   Key: gap  |  Values: xs · s · m · l · xl · xxl
+   Sets the gap between grid items. Typically paired with the grid key.
+   --------------------------------------------------------------------------- */
+.section[data-gap="xs"]  { --gap-spacing: var(--spacing-xs); }
+.section[data-gap="s"]   { --gap-spacing: var(--spacing-s); }
+.section[data-gap="m"]   { --gap-spacing: var(--spacing-m); }
+.section[data-gap="l"]   { --gap-spacing: var(--spacing-l); }
+.section[data-gap="xl"]  { --gap-spacing: var(--spacing-xl); }
+.section[data-gap="xxl"] { --gap-spacing: var(--spacing-xxl); }
+
+/* --- Container Width -------------------------------------------------------
+   Key: container  |  Values: 2 · 4 · 6
+   Constrains block and default content to a narrower max-width.
+   Uses the 12-column grid token: 2 = ~4 cols; 4 = ~8 cols; 6 = full grid.
+   --------------------------------------------------------------------------- */
+.section[data-container] .default-content,
+.section[data-container] .block-content {
+  max-width: var(--section-container-width);
+  margin-inline: auto;
+}
+
+.section[data-container="2"] { --section-container-width: calc(var(--grid-column-width) * 4); }
+.section[data-container="4"] { --section-container-width: calc(var(--grid-column-width) * 8); }
+.section[data-container="6"] { --section-container-width: var(--grid-container-width); }
+
+/* --- Text Alignment --------------------------------------------------------
+   Key: style  |  Value: center
+   Centers all text within default-content wrappers.
+   (Applied via the "style" key, so it becomes a class.)
+   --------------------------------------------------------------------------- */
+.section.center .default-content {
+  text-align: center;
+}
+
+/* --- Background Image ------------------------------------------------------
+   Key: background  |  Value: <image path>
+   Full-bleed background image rendered behind all section content.
+   The pre-renderer injects the image as <picture class="section-background">
+   and adds class "has-background" to the section element.
+   --------------------------------------------------------------------------- */
+.section.has-background {
+  position: relative;
+}
+
+.section.has-background .default-content,
+.section.has-background .block-content {
+  position: relative;
+}
+
+.section picture.section-background {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.section .section-background img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+/* --- Layout Presets --------------------------------------------------------
+   Key: layout  |  Values: bento
+   Pre-defined structural arrangements for specific content patterns.
+   --------------------------------------------------------------------------- */
+
+/* layout: bento — 3-column asymmetric named-area grid, supports up to 5 blocks */
+.section[data-layout="bento"] .block-content {
+  display: grid;
+  gap: var(--gap-spacing);
+  grid-template-columns: 1fr;
+}
+
+/* ---- Grid Responsive Breakpoints ------------------------------------------
+   These rules expand section grids at progressive viewport widths.
+   --------------------------------------------------------------------------- */
+
+/* 2-column grids activate at 600px+ */
+@media (width >= 600px) {
+  .section[data-grid="2"] .block-content {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+  }
+}
+
+@media (width >= 900px) {
+  /* 4- and 6-column grids show half their columns at tablet */
+  .section[data-grid="4"] .block-content,
+  .section[data-grid="6"] .block-content {
+    display: grid;
+    grid-template-columns: repeat(calc(var(--grid-size) / 2), 1fr);
+  }
+
+  /* Container width adjustments at tablet */
+  .section[data-container="4"] {
+    --section-container-width: calc(var(--grid-column-width) * 4);
+  }
+
+  .section[data-container="6"] {
+    --section-container-width: calc(var(--grid-column-width) * 6);
+  }
+
+  /* peek-background: image peeks visually below the section bottom edge */
+  /* Note: "peek-background" is a style value, so it becomes a class */
+  .section.peek-background .section-background img {
+    object-position: 0 40%;
+  }
+
+  .section.peek-background .default-content {
+    margin-bottom: calc(var(--spacing-xxl) * 12);
+  }
+
+  /* Bento expands to a named 3-column layout at 900px+ */
+  .section[data-layout="bento"] .block-content {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+      "one   one   two"
+      "one   one   three"
+      "four  five  five";
+
+    > * {
+      container-type: inline-size;
+    }
+
+    > *:nth-child(1) { grid-area: one; }
+    > *:nth-child(2) { grid-area: two; }
+    > *:nth-child(3) { grid-area: three; }
+    > *:nth-child(4) { grid-area: four; }
+    > *:nth-child(5) { grid-area: five; }
+    > *:nth-child(6) { grid-area: six; }
+  }
+}
+
+/* All grids expand to the full declared column count at 1200px+ */
+@media (width >= 1200px) {
+  .section[data-grid] .block-content {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+  }
+}
+
+/* ==========================================================================
+   SECTION THEME VARIANTS
+   ============================================================================
+   KP-specific background and visual theme classes applied via section metadata.
+   Key: style  |  Values listed below.
+   ========================================================================== */
+
+/* style: pale-blue — light teal wash background */
 main .section.pale-blue {
   background-color: var(--color-pale-blue);
 }
 
+/* style: light / highlight — soft grey background */
 main .section.light,
 main .section.highlight {
   background-color: var(--color-grey-light);
 }
 
+/* style: dark-blue — ensures links remain legible on dark backgrounds */
 main .section.dark-blue a:any-link {
   text-decoration: underline;
 }
 
+/* style: full-width — breaks out of the content max-width container */
 main .section.full-width {
   width: 100%;
   max-width: none;
@@ -751,7 +968,7 @@ main .section.full-width > div {
   padding-inline: 0;
 }
 
-/* table-grid: renders multiple table blocks side by side */
+/* style: table-grid — renders multiple table blocks side by side */
 main > .section.table-grid > .block-content {
   display: flex;
   flex-wrap: wrap;
@@ -769,7 +986,7 @@ main > .section.table-grid > .block-content {
   }
 }
 
-/* footnotes */
+/* style: footnotes — small-print annotations below a horizontal border */
 main .section.footnotes {
   margin: 0 1rem;
 }
