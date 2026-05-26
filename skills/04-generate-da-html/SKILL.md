@@ -469,6 +469,20 @@ Before producing the final HTML file, verify:
 
 ---
 
+### Footer — Not Generated
+
+The footer is identical across all secondary sites and is maintained centrally on
+the template site. Each forked repo's `blocks/footer/footer.js` is configured to
+load the footer directly from the template site at runtime — no `footer.html` is
+needed per site, and EMA does not generate one.
+
+> If a fork's `footer.js` has not yet been updated, the `FOOTER_PATH` constant
+> must be changed to the absolute template URL:
+> `https://main--ak-kaiserpermanente--adobedrago.aem.page/fragments/nav/footer`
+> This is a one-time fork setup step, not a migration step.
+
+---
+
 ### Step 4d — Generate the Nav File
 
 Using the nav manifest from `skills/01-discover-pages`, generate a single `nav.html`

@@ -122,6 +122,25 @@ Total sections: [N]
 5. Preview each page at:
    `https://main--ak-kaiserpermanente--adobedrago.aem.page/[employer-name]/`
 6. Review the items flagged above before publishing
+
+---
+
+## Fork Setup Requirement — Footer
+
+The footer does not need to be uploaded to DA. It is loaded at runtime from the
+central template site. However, this requires a one-time code change in the forked
+repo's `blocks/footer/footer.js`:
+
+```js
+// Change this line:
+const FOOTER_PATH = '/fragments/nav/footer';
+
+// To this:
+const FOOTER_PATH = 'https://main--ak-kaiserpermanente--adobedrago.aem.page/fragments/nav/footer';
+```
+
+This change must be made before the site goes live. It is a fork setup step —
+not part of the DA content upload.
 ```
 
 ---
