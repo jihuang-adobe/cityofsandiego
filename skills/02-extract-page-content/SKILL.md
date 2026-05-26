@@ -36,17 +36,9 @@ For each page in the inventory, fetch the full HTML.
 
 ---
 
-### Step 2b — Strip Decorative Icons Before Extracting
+### Step 2b — Ignore Inline SVGs
 
-Before reading any content, remove all "opens in new tab" SVG and image icons from the HTML.
-These appear after links throughout KP source pages as decorative UI elements — they are not content.
-
-Identify and discard any element that matches:
-- An `<svg>` immediately following or inside an `<a>` tag
-- An `<img>` with alt text containing "new tab", "external", or an empty alt immediately following a link
-- Any element with a class name containing `external`, `new-tab`, `icon-external`, or similar
-
-Capture only the link text and href — never the icon element.
+Skip all inline `<svg>` elements encountered during scraping. KP source pages inject these programmatically as decorative "opens in new tab" icons — they are never content.
 
 ---
 
