@@ -59,12 +59,15 @@ Date: [today's date]
 
 ## Files Generated
 
+Files upload to the root of the DA workspace for the forked repo (`kp-{employer}`).
+There is no employer subfolder — the workspace itself is the employer's site.
+
 | # | File | Destination (DA path) | Description |
 |---|------|-----------------------|-------------|
 | — | nav.html | /fragments/nav/header | Site navigation |
-| 1 | index.html | /[employer-name]/index | Home page |
-| 2 | plans.html | /[employer-name]/plans | Plans & Benefits |
-| 3 | getting-care.html | /[employer-name]/getting-care | Getting Care |
+| 1 | index.html | /index | Home page |
+| 2 | plans.html | /plans | Plans & Benefits |
+| 3 | getting-care.html | /getting-care | Getting Care |
 | ... | | | |
 
 ---
@@ -113,18 +116,17 @@ Total sections: [N]
 
 ## Next Steps — Uploading to DA
 
-1. Go to: https://da.live/#/adobedrago/ak-kaiserpermanente/
-2. Upload the nav file first — it lives outside the employer folder:
-   - `nav.html` → `/fragments/nav/header`
-3. Create a new folder for this employer: `/[employer-name]/`
-4. Upload each page HTML file to its corresponding path:
-   - `index.html` → `/[employer-name]/index`
-   - `plans.html` → `/[employer-name]/plans`
-   - `getting-care.html` → `/[employer-name]/getting-care`
+1. Go to the DA workspace for this employer's forked repo:
+   `https://da.live/#/{org}/kp-{employer}/`
+2. Upload `nav.html` → `/fragments/nav/header`
+3. Upload each page HTML file to the root of the workspace:
+   - `index.html` → `/index`
+   - `plans.html` → `/plans`
+   - `getting-care.html` → `/getting-care`
    - *(and so on for each page)*
-5. Preview each page at:
-   `https://main--ak-kaiserpermanente--adobedrago.aem.page/[employer-name]/`
-6. Review the items flagged above before publishing
+4. Preview the site at:
+   `https://main--kp-{employer}--{org}.aem.page/`
+5. Review the items flagged above before publishing
 
 ---
 

@@ -9,8 +9,10 @@ A guide for migrating a Kaiser Permanente secondary sales site into AEM Edge Del
 Complete these steps once per new employer site, before running EMA:
 
 **1. Create and configure the fork**
-- Fork this repository (`ak-kaiserpermanente`) into a new GitHub repo for the employer
-- Set up a DA workspace and connect it to the forked repo
+- Fork this repository (`AdobeDrago/ak-kaiserpermanente`) into a new GitHub repo named `kp-{employer}`
+  - Example: `https://github.com/{org}/kp-google`
+- DA automatically creates a workspace that mirrors the forked repo:
+  - Example: `https://da.live/#/{org}/kp-google`
 - Set up the `.page` / `.live` preview and publish environments
 
 **2. Update the footer**
@@ -80,15 +82,15 @@ EMA produces a full report: pages migrated, blocks used, and a checklist of item
 
 ### Files
 
-The employer slug is derived from the source URL path — for example, `https://choose.kaiserpermanente.org/google` produces a slug of `google`.
+Files upload directly to the root of the DA workspace for the forked repo — there is no employer subfolder. The workspace itself is the employer's site.
 
 | File | DA upload path |
 |---|---|
 | `nav.html` | `/fragments/nav/header` |
-| `index.html` | `/google/index` |
-| `plans.html` | `/google/plans` |
-| `getting-care.html` | `/google/getting-care` |
-| *(one file per page)* | `/[slug]/[page-name]` |
+| `index.html` | `/index` |
+| `plans.html` | `/plans` |
+| `getting-care.html` | `/getting-care` |
+| *(one file per page)* | `/[page-name]` |
 
 ### Migration summary
 
@@ -110,12 +112,17 @@ The summary includes:
 
 ## Uploading to DA
 
-1. Go to [DA](https://da.live/#/adobedrago/ak-kaiserpermanente/)
-2. Upload `nav.html` first → `/fragments/nav/header`
-3. Create a folder `/[slug]/` (e.g. `/google/`)
-4. Upload each page file to its path inside that folder
-5. Preview the site at:
-   `https://main--[fork-repo]--adobedrago.aem.page/[slug]/`
+1. Go to your DA workspace: `https://da.live/#/{org}/kp-{employer}/`
+   - Example: `https://da.live/#/adobedrago/kp-google`
+2. Upload `nav.html` → `/fragments/nav/header`
+3. Upload each page file to the root of the workspace:
+   - `index.html` → `/index`
+   - `plans.html` → `/plans`
+   - `getting-care.html` → `/getting-care`
+   - *(and so on for each page)*
+4. Preview the site at:
+   `https://main--kp-{employer}--{org}.aem.page/`
+   - Example: `https://main--kp-google--adobedrago.aem.page/`
 
 ---
 
