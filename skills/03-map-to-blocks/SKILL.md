@@ -59,7 +59,28 @@ block decisions, especially for ambiguous layout patterns.
 
 ---
 
-### Step 3b — Map Each Section
+### Step 3b — Define Section Boundaries
+
+Before mapping blocks, establish where each section begins and ends.
+
+**Section boundary rules:**
+- Most blocks → one block per section
+- **Card rows** → heading + all cards (typically 3) share ONE section
+- **Table rate groups** → heading + all sibling `table striped` blocks share ONE section
+- **Summary of benefits** → heading + all `table caption striped` blocks share ONE section
+- A heading or intro text that introduces a block belongs **in the same section** as that block
+- Standalone default content (headings, paragraphs, lists — no block) gets its own section
+- Default content can have a section style (e.g. `pale-blue`) even with no block
+- The legal/footnote text is always the last section
+
+**Section-metadata note:**
+EDS pre-renders section-metadata on the server side into classes and data attributes on the wrapper div.
+Do not include a section-metadata table in the generated HTML — apply the output directly to the `<div>`.
+`hero landing` on inner pages has **no** `full-width` wrapper — only the homepage hero uses `full-width`.
+
+---
+
+### Step 3c — Map Each Section
 
 For each section in the content manifest, make three decisions:
 
@@ -79,11 +100,11 @@ Determine if the section has a distinct background or layout requirement:
 - Hero section on homepage only → `style: full-width`
 - Multiple tables side by side → `style: table-grid`
 - Legal/footnote text (always last section) → `style: footnotes`
-- No special styling → no section-metadata needed
+- No special styling → no section-metadata needed (plain `<div>` wrapper)
 
 ---
 
-### Step 3c — Apply Block Selection Priority
+### Step 3d — Apply Block Selection Priority
 
 Follow this priority order — do not skip steps:
 
@@ -94,7 +115,7 @@ Follow this priority order — do not skip steps:
 
 ---
 
-### Step 3d — Output the Mapping Plan
+### Step 3e — Output the Mapping Plan
 
 For each page, produce a mapping plan before any HTML is generated:
 

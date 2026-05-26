@@ -34,8 +34,9 @@ From the generated HTML files, count:
 ### Step 5b — Flag Items for Review
 
 Identify any sections or content that may need human review:
-- Sections that used default content but may benefit from a block
+- **All external image URLs** — every image in the generated HTML still points to the source CDN (`choose.kaiserpermanente.org/content/dam/...`). These work immediately but should be replaced with DA media URLs (`./media_[hash].[ext]`) after the business owner uploads images to DA
 - Images that could not be fetched or had missing alt text
+- Sections that used default content but may benefit from a block
 - Content patterns that didn't cleanly match a block mapping rule
 - Employer-specific content that may need brand/legal approval
 - Phone numbers, plan codes, or enrollment URLs that should be verified
@@ -50,6 +51,18 @@ Output the complete migration summary in this format:
 # Migration Summary — [Employer Name]
 Source: [source URL]
 Date: [today's date]
+
+---
+
+## Files Generated
+
+| # | File | Destination (DA path) | Description |
+|---|------|-----------------------|-------------|
+| — | nav.html | /fragments/nav/header | Site navigation |
+| 1 | index.html | /[employer-name]/index | Home page |
+| 2 | plans.html | /[employer-name]/plans | Plans & Benefits |
+| 3 | getting-care.html | /[employer-name]/getting-care | Getting Care |
+| ... | | | |
 
 ---
 
@@ -98,15 +111,17 @@ Total sections: [N]
 ## Next Steps — Uploading to DA
 
 1. Go to: https://da.live/#/adobedrago/ak-kaiserpermanente/
-2. Create a new folder for this employer: `/[employer-name]/`
-3. Upload each HTML file to its corresponding path:
+2. Upload the nav file first — it lives outside the employer folder:
+   - `nav.html` → `/fragments/nav/header`
+3. Create a new folder for this employer: `/[employer-name]/`
+4. Upload each page HTML file to its corresponding path:
    - `index.html` → `/[employer-name]/index`
    - `plans.html` → `/[employer-name]/plans`
    - `getting-care.html` → `/[employer-name]/getting-care`
    - *(and so on for each page)*
-4. Preview each page at:
+5. Preview each page at:
    `https://main--ak-kaiserpermanente--adobedrago.aem.page/[employer-name]/`
-5. Review the items flagged above before publishing
+6. Review the items flagged above before publishing
 ```
 
 ---

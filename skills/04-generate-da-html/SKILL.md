@@ -39,6 +39,38 @@ For each section in the mapping plan, generate the HTML using the rules below.
 
 ---
 
+#### Section Structure Rules
+
+Each top-level `<div>` inside `<main>` = one section (one section break in DA).
+
+EDS pre-renders section-metadata on the server side into classes and data attributes on the wrapper `<div>`. Do not include a section-metadata table in the generated HTML — apply the output directly.
+
+**Section wrapper reference — use exactly as shown:**
+
+| Content type | Wrapper div |
+|---|---|
+| hero (landing) — homepage only | `<div class="full-width">` |
+| hero (landing) — inner pages | `<div>` |
+| Single block (no style) | `<div>` |
+| Single block — pale-blue background | `<div class="pale-blue">` |
+| Default content only — pale-blue background | `<div class="pale-blue">` |
+| Card row (heading + 3 cards) | `<div data-grid="3" data-gap="s" data-spacing="m">` |
+| Table rates group (heading + 3 table striped) | `<div data-grid="3" data-gap="xl" data-spacing="md">` |
+| Summary of benefits (multiple table caption striped) | `<div class="table-grid">` |
+| Footnotes | `<div class="footnotes">` |
+| Default content only (no style) | `<div>` |
+
+**Grouping rules:**
+- Most blocks → one block per section
+- Card rows → heading + all cards (typically 3) go in ONE section with `data-grid` attributes
+- Table rates groups → heading + all sibling tables go in ONE section with `data-grid` attributes
+- Summary of benefits → heading + all `table caption striped` blocks in ONE section with `table-grid` class
+- A heading or intro text that introduces a block belongs in the **same section** as that block
+- Standalone default content (headings, paragraphs, lists, links — no block) gets its own section
+- Default content can also have a section style (e.g. `pale-blue`) with no block
+
+---
+
 #### Default Content Sections
 
 Plain headings, paragraphs, and links. No wrapping block div needed.
@@ -61,6 +93,20 @@ For a `footnotes` styled section:
 
 ---
 
+#### Image URL Handling
+
+Use the **full absolute URL** from the source site for all images. Do not modify, shorten, or make URLs relative.
+
+```
+src="https://choose.kaiserpermanente.org/content/dam/kp/secondsales/.../hero.jpg"
+```
+
+This matches the standard EDS import approach. The KP source CDN is publicly accessible, so images will load correctly from DA. The business owner can replace them with DA media URLs (`./media_[hash].[ext]`) after uploading images to DA — but this is a post-migration step, not a blocker.
+
+Every external image URL must be listed in the Step 5 migration summary for review.
+
+---
+
 #### Hero — Landing (homepage)
 
 ```html
@@ -69,9 +115,9 @@ For a `footnotes` styled section:
     <div>
       <div>
         <picture>
-          <source type="image/webp" srcset="[image-url]?format=webply&optimize=medium" media="(min-width: 600px)">
-          <source type="image/webp" srcset="[image-url]?format=webply&optimize=medium">
-          <img loading="lazy" alt="[alt text]" src="[image-url]">
+          <source type="image/webp" srcset="[full-absolute-image-url]?format=webply&optimize=medium" media="(min-width: 600px)">
+          <source type="image/webp" srcset="[full-absolute-image-url]?format=webply&optimize=medium">
+          <img loading="lazy" alt="[alt text]" src="[full-absolute-image-url]">
         </picture>
       </div>
       <div>
@@ -92,9 +138,9 @@ For a `footnotes` styled section:
     <div>
       <div>
         <picture>
-          <source type="image/webp" srcset="[image-url]?format=webply&optimize=medium" media="(min-width: 600px)">
-          <source type="image/webp" srcset="[image-url]?format=webply&optimize=medium">
-          <img loading="lazy" alt="[alt text]" src="[image-url]">
+          <source type="image/webp" srcset="[full-absolute-image-url]?format=webply&optimize=medium" media="(min-width: 600px)">
+          <source type="image/webp" srcset="[full-absolute-image-url]?format=webply&optimize=medium">
+          <img loading="lazy" alt="[alt text]" src="[full-absolute-image-url]">
         </picture>
       </div>
       <div>
@@ -120,8 +166,8 @@ For a `footnotes` styled section:
         <p>[Tab 1 body]</p>
         <p><a href="[href]">[CTA text]</a></p>
         <picture>
-          <source type="image/webp" srcset="[image-url]">
-          <img loading="lazy" alt="[alt]" src="[image-url]">
+          <source type="image/webp" srcset="[full-absolute-image-url]">
+          <img loading="lazy" alt="[alt]" src="[full-absolute-image-url]">
         </picture>
       </div>
     </div>
@@ -200,8 +246,8 @@ For `align-vertically` variant:
     <div>
       <div>
         <picture>
-          <source type="image/webp" srcset="[icon-url]">
-          <img loading="lazy" alt="[alt]" src="[icon-url]">
+          <source type="image/webp" srcset="[full-absolute-icon-url]">
+          <img loading="lazy" alt="[alt]" src="[full-absolute-icon-url]">
         </picture>
       </div>
       <div>
@@ -216,15 +262,15 @@ For `align-vertically` variant:
 
 ---
 
-#### Card (author 3 in one section for a card row)
+#### Card — with image
 
 ```html
 <div>
   <div class="card">
     <div>
       <picture>
-        <source type="image/webp" srcset="[image-url]">
-        <img loading="lazy" alt="[alt]" src="[image-url]">
+        <source type="image/webp" srcset="[full-absolute-image-url]">
+        <img loading="lazy" alt="[alt]" src="[full-absolute-image-url]">
       </picture>
     </div>
     <div>
@@ -235,12 +281,28 @@ For `align-vertically` variant:
       <p><a href="[href]">[CTA text]</a></p>
     </div>
   </div>
+  <!-- repeat for each card in the row -->
+</div>
+```
+
+#### Card — text only (no image)
+
+Use when the source content has no image — heading, body text, lists, and links only.
+
+```html
+<div>
   <div class="card">
-    <!-- second card -->
+    <div>
+      <h3>[Card heading]</h3>
+      <p>[Card body]</p>
+      <ul>
+        <li>[List item]</li>
+        <li>[List item]</li>
+      </ul>
+      <p><a href="[href]">[CTA text]</a></p>
+    </div>
   </div>
-  <div class="card">
-    <!-- third card -->
-  </div>
+  <!-- repeat for each card in the row -->
 </div>
 ```
 
@@ -274,8 +336,8 @@ For `align-vertically` variant:
     <div>
       <div>
         <picture>
-          <source type="image/webp" srcset="[icon-url]">
-          <img loading="lazy" alt="[alt]" src="[icon-url]">
+          <source type="image/webp" srcset="[full-absolute-icon-url]">
+          <img loading="lazy" alt="[alt]" src="[full-absolute-icon-url]">
         </picture>
       </div>
       <div><p>[Body text]</p></div>
@@ -293,8 +355,8 @@ For `align-vertically` variant:
     <div>
       <div>
         <picture>
-          <source type="image/webp" srcset="[icon-url]">
-          <img loading="lazy" alt="[alt]" src="[icon-url]">
+          <source type="image/webp" srcset="[full-absolute-icon-url]">
+          <img loading="lazy" alt="[alt]" src="[full-absolute-icon-url]">
         </picture>
       </div>
       <div>
@@ -407,10 +469,78 @@ Before producing the final HTML file, verify:
 
 ---
 
+### Step 4d — Generate the Nav File
+
+Using the nav manifest from `skills/01-discover-pages`, generate a single `nav.html`
+file to be uploaded to DA at `/fragments/nav/header`.
+
+The nav has three sections — one `<div>` per section inside `<main>`.
+
+#### Nav Structure
+
+```html
+<body>
+  <header></header>
+  <main>
+
+    <!-- Section 1: Utility bar -->
+    <!-- If utility links were found: -->
+    <div>
+      <ul>
+        <li><a href="[href]">[Link text]</a></li>
+        <!-- repeat for each utility link from the nav manifest -->
+      </ul>
+    </div>
+    <!-- If Section 1 is empty: -->
+    <div></div>
+
+    <!-- Section 2: Brand bar -->
+    <div>
+      <p>
+        <picture>
+          <img loading="lazy" alt="Kaiser Permanente" src="https://main--ak-kaiserpermanente--adobedrago.aem.page/fragments/nav/media_129252eb0ed4a8d722c06c7b18a6640ff53eeb536.svg">
+        </picture>
+      </p>
+      <p>
+        <picture>
+          <img loading="lazy" alt="[Employer logo alt]" src="[full-absolute-employer-logo-url]">
+        </picture>
+      </p>
+      <p><a href="https://healthy.kaiserpermanente.org/register">Register</a></p>
+      <p><span class="icon icon-profilecircle"></span><a href="https://healthy.kaiserpermanente.org/sign-on">Sign In</a></p>
+    </div>
+
+    <!-- Section 3: Primary nav links (use site-relative paths from nav manifest) -->
+    <div>
+      <ul>
+        <li><a href="/" title="Home">Home</a></li>
+        <li><a href="[site-relative-path]">[Link text]</a></li>
+        <!-- repeat for each nav link; only the Home link uses title="Home" -->
+      </ul>
+    </div>
+
+  </main>
+  <footer></footer>
+</body>
+```
+
+#### Key Rules
+
+- **KP logo** — always the fixed absolute URL above; never scrape from source
+- **Employer logo** — use the full absolute URL from the nav manifest
+- **Section 3 links** — use site-relative paths (e.g. `/plans`, `/getting-care`), never source URLs
+- **Home link** — always `href="/"` with `title="Home"`; all other links have no `title` attribute
+- **Section 1 empty** — if no utility bar was found, output `<div></div>` (required as section placeholder)
+
+---
+
 ## Output
 
-One complete, validated HTML file per page.
-Named after the page path (e.g. `index.html`, `plans.html`, `support.html`).
-Passed to `skills/05-output-summary` for the migration report.
+One complete, validated HTML file per page **plus** one `nav.html` file.
+
+Page files are named after the page path (e.g. `index.html`, `plans.html`, `support.html`).
+`nav.html` is uploaded to DA at `/fragments/nav/header` (not under the employer folder).
+
+All files are passed to `skills/05-output-summary` for the migration report.
 
 **IMPORT ALL CONTENT. Partial migration is unacceptable.**
