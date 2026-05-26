@@ -74,9 +74,11 @@ Before mapping blocks, establish where each section begins and ends.
 - The legal/footnote text is always the last section
 
 **Section-metadata note:**
-EDS pre-renders section-metadata on the server side into classes and data attributes on the wrapper div.
-Do not include a section-metadata table in the generated HTML — apply the output directly to the `<div>`.
-`hero landing` on inner pages has **no** `full-width` wrapper — only the homepage hero uses `full-width`.
+The Section Style column in the mapping plan drives the `section-metadata` block that gets added at the
+bottom of each section in the generated HTML. All section wrappers are plain `<div>` elements — EDS reads
+the `section-metadata` block at render time and applies classes/data attributes itself.
+`hero landing` on the homepage gets `style: full-width` in its section-metadata.
+`hero landing` on inner pages has no section-metadata — plain `<div>` wrapper only.
 
 ---
 

@@ -41,37 +41,75 @@ For each section in the mapping plan, generate the HTML using the rules below.
 
 #### Section Structure Rules
 
-Each top-level `<div>` inside `<main>` = one section (one section break in DA).
+Each top-level `<div>` inside `<main>` = one section.
 
-EDS pre-renders section-metadata on the server side into classes and data attributes on the wrapper `<div>`. Do not include a section-metadata table in the generated HTML — apply the output directly.
+**All section wrappers use a plain `<div>` — no classes or data attributes on the wrapper.**
 
-**Section wrapper reference — use exactly as shown:**
+Styling and layout are controlled by a `section-metadata` block placed at the **bottom** of any section that needs it. EDS reads this block at render time and applies the appropriate classes and data attributes.
 
-| Content type | Wrapper div |
+**When to add section-metadata:**
+
+| Section type | Keys to include |
 |---|---|
-| hero (landing) — homepage only | `<div class="full-width">` |
-| hero (landing) — inner pages | `<div>` |
-| Single block (no style) | `<div>` |
-| Single block — pale-blue background | `<div class="pale-blue">` |
-| Default content only — pale-blue background | `<div class="pale-blue">` |
-| Card row — 2 cards | `<div data-grid="2" data-gap="s" data-spacing="m">` |
-| Card row — 3 cards | `<div data-grid="3" data-gap="s" data-spacing="m">` |
-| Card row — 4 cards | `<div data-grid="4" data-gap="s" data-spacing="m">` |
-| Single card (no row) | `<div>` |
-| Table rates group — 2 tables | `<div data-grid="2" data-gap="xl" data-spacing="md">` |
-| Table rates group — 3 tables | `<div data-grid="3" data-gap="xl" data-spacing="md">` |
-| Summary of benefits (multiple table caption striped) | `<div class="table-grid">` |
-| Footnotes | `<div class="footnotes">` |
-| Default content only (no style) | `<div>` |
+| Hero (landing) — homepage only | `style: full-width` |
+| Light blue/teal background | `style: pale-blue` |
+| Card row — 2 cards | `grid: 2`, `gap: s`, `spacing: m` |
+| Card row — 3 cards | `grid: 3`, `gap: s`, `spacing: m` |
+| Card row — 4 cards | `grid: 4`, `gap: s`, `spacing: m` |
+| Table rates group — 2 tables | `grid: 2`, `gap: xl`, `spacing: md` |
+| Table rates group — 3 tables | `grid: 3`, `gap: xl`, `spacing: md` |
+| Summary of benefits | `style: table-grid` |
+| Footnotes | `style: footnotes` |
+| All other sections | No section-metadata needed |
+
+**Section-metadata block format:**
+
+```html
+<div class="section-metadata">
+  <div>
+    <div>[key]</div>
+    <div>[value]</div>
+  </div>
+  <!-- one row per key-value pair -->
+</div>
+```
+
+Single value example (`pale-blue`):
+```html
+<div class="section-metadata">
+  <div>
+    <div>style</div>
+    <div>pale-blue</div>
+  </div>
+</div>
+```
+
+Multiple keys example (card row, 3 cards):
+```html
+<div class="section-metadata">
+  <div>
+    <div>grid</div>
+    <div>3</div>
+  </div>
+  <div>
+    <div>gap</div>
+    <div>s</div>
+  </div>
+  <div>
+    <div>spacing</div>
+    <div>m</div>
+  </div>
+</div>
+```
 
 **Grouping rules:**
 - Most blocks → one block per section
-- Card rows → heading + all cards go in ONE section; use `data-grid` value matching the actual card count
-- Table rates groups → heading + all sibling tables go in ONE section; use `data-grid` value matching the actual table count
-- Summary of benefits → heading + all `table caption striped` blocks in ONE section with `table-grid` class
+- Card rows → heading + all cards in ONE section + section-metadata with matching `grid` count
+- Table rates groups → heading + all sibling tables in ONE section + section-metadata with matching `grid` count
+- Summary of benefits → heading + all `table caption striped` blocks in ONE section with `style: table-grid`
 - A heading or intro text that introduces a block belongs in the **same section** as that block
 - Standalone default content (headings, paragraphs, lists, links — no block) gets its own section
-- Default content can also have a section style (e.g. `pale-blue`) with no block
+- Default content can also have section styling (e.g. `pale-blue`) with no block
 
 ---
 
@@ -89,9 +127,15 @@ Plain headings, paragraphs, and links. No wrapping block div needed.
 
 For a `footnotes` styled section:
 ```html
-<div class="footnotes">
+<div>
   <p><sup>1</sup> Footnote text exactly as written.</p>
   <p><sup>2</sup> Second footnote text.</p>
+  <div class="section-metadata">
+    <div>
+      <div>style</div>
+      <div>footnotes</div>
+    </div>
+  </div>
 </div>
 ```
 
@@ -114,7 +158,7 @@ Every external image URL must be listed in the Step 5 migration summary for revi
 #### Hero — Landing (homepage)
 
 ```html
-<div class="full-width">
+<div>
   <div class="hero landing">
     <div>
       <div>
@@ -129,6 +173,12 @@ Every external image URL must be listed in the Step 5 migration summary for revi
         <p>[Body text]</p>
         <p><strong><a href="[CTA href]">[CTA text]</a></strong></p>
       </div>
+    </div>
+  </div>
+  <div class="section-metadata">
+    <div>
+      <div>style</div>
+      <div>full-width</div>
     </div>
   </div>
 </div>
@@ -208,11 +258,17 @@ Every external image URL must be listed in the Step 5 migration summary for revi
 </div>
 ```
 
-For `pale-blue` section style:
+For `pale-blue` section style, add section-metadata inside the section:
 ```html
-<div class="pale-blue">
+<div>
   <div class="columns">
     ...
+  </div>
+  <div class="section-metadata">
+    <div>
+      <div>style</div>
+      <div>pale-blue</div>
+    </div>
   </div>
 </div>
 ```
@@ -310,6 +366,8 @@ Use when the source content has no image — heading, body text, lists, and link
 </div>
 ```
 
+> **Card row section-metadata:** When multiple cards share a section, add `section-metadata` with `grid`, `gap`, and `spacing` at the bottom of the section — after the last card block. See Section Structure Rules above for the correct values per card count.
+
 ---
 
 #### Accordion
@@ -377,7 +435,7 @@ Use when the source content has no image — heading, body text, lists, and link
 #### Plan Compare
 
 ```html
-<div class="pale-blue">
+<div>
   <div class="plan-compare">
     <div>
       <div><p><strong>[Plan A Name]</strong></p></div>
@@ -391,6 +449,12 @@ Use when the source content has no image — heading, body text, lists, and link
       <div><p>[Plan C value]</p></div>
     </div>
     <!-- repeat rows for each feature -->
+  </div>
+  <div class="section-metadata">
+    <div>
+      <div>style</div>
+      <div>pale-blue</div>
+    </div>
   </div>
 </div>
 ```
@@ -420,7 +484,7 @@ Use when the source content has no image — heading, body text, lists, and link
 #### Table (caption striped) — for Summary of Benefits
 
 ```html
-<div class="table-grid">
+<div>
   <div class="table caption striped">
     <div>
       <div><p>[Caption — spans full width]</p></div>
@@ -438,7 +502,13 @@ Use when the source content has no image — heading, body text, lists, and link
       <div><p>[Data]</p></div>
     </div>
   </div>
-  <!-- additional table blocks side by side -->
+  <!-- additional table caption striped blocks side by side -->
+  <div class="section-metadata">
+    <div>
+      <div>style</div>
+      <div>table-grid</div>
+    </div>
+  </div>
 </div>
 ```
 
@@ -499,7 +569,9 @@ Before producing the final HTML file, verify:
 - [ ] Section count matches the mapping plan
 - [ ] Every heading, paragraph, link, and phone number from the content manifest is present
 - [ ] Every image has a `<picture>` wrapper with `loading="lazy"`
-- [ ] If legal/footnote text exists, it is the last section in `<div class="footnotes">`
+- [ ] Every section wrapper is a plain `<div>` — no classes or data attributes on wrappers
+- [ ] Every section that needs styling has a `section-metadata` block at its bottom
+- [ ] If legal/footnote text exists, it is the last section with `style: footnotes` in its section-metadata
 - [ ] No `<html>` or `<head>` tags present
 - [ ] No placeholder text — all content is real
 
