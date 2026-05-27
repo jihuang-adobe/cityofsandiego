@@ -644,8 +644,12 @@ The nav has three sections — one `<div>` per section inside `<main>`.
         <!-- repeat for each utility link from the nav manifest -->
       </ul>
     </div>
-    <!-- If Section 1 is empty: -->
-    <div></div>
+    <!-- If Section 1 is empty — output the default language toggle: -->
+    <div>
+      <ul>
+        <li><span class="icon icon-globe"></span><a href="https://main--kp-[employer-slug]--[org].aem.page/tools/widgets/language">Change language</a></li>
+      </ul>
+    </div>
 
     <!-- Section 2: Brand bar -->
     <div>
@@ -685,7 +689,7 @@ The nav has three sections — one `<div>` per section inside `<main>`.
 - **Employer logo** — use the full absolute URL from the nav manifest
 - **Section 3 links** — use site-relative paths (e.g. `/plans`, `/getting-care`), never source URLs
 - **Home link** — always `href="/"` with `title="Home"`; all other links have no `title` attribute
-- **Section 1 empty** — if no utility bar was found, output `<div></div>` (required as section placeholder)
+- **Section 1 empty** — if no utility bar was found on the source site, output the default language toggle (globe icon + "Change language" link). Use the fork's own AEM page URL: `https://main--kp-[employer-slug]--[org].aem.page/tools/widgets/language`. The employer slug comes from Step 1; the org matches the template site org (e.g. `adobedrago`). Never output a bare `<div></div>` for Section 1.
 
 ---
 

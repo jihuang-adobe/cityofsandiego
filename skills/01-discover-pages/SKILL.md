@@ -68,6 +68,7 @@ For each link record:
 - **href** — the href value as-is from the source
 
 If the utility bar is absent or empty, record it as **empty**.
+Step 4 will automatically insert a default language toggle link for empty utility bars — just record what you find.
 
 #### Section 2 — Brand Bar
 
