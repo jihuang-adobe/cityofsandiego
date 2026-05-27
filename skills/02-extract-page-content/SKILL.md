@@ -16,12 +16,7 @@ Produces a structured content manifest that feeds into block mapping.
 ## When to Use
 
 - Second step of every secondary site migration
-- After `skills/01-discover-pages` has produced a confirmed page inventory
-
-## When NOT to Use
-
-- Before the page inventory is complete
-- Assigning block names (that happens in `skills/03-map-to-blocks`)
+- After `skills/01-discover-pages` has produced a complete page inventory
 
 ---
 
@@ -121,7 +116,8 @@ For each page, produce a structured manifest:
 ## Output
 
 A complete content manifest for every page in the inventory.
-Passed to `skills/03-map-to-blocks` for block assignment.
 
 **Do not summarize, truncate, or paraphrase any content.**
 Every word, link, phone number, and legal disclaimer must be captured exactly.
+
+Continue directly to Step 3 (`skills/03-map-to-blocks`) for block mapping — do not pause or wait.

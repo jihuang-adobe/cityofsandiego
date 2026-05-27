@@ -20,7 +20,7 @@ content extraction and nav HTML generation.
 
 ## When NOT to Use
 
-- You already have a confirmed page inventory
+- You already have a complete page inventory
 - You are migrating a single known page only
 
 ---
@@ -122,7 +122,7 @@ For each page, determine its type:
 
 ### Step 1f — Output the Page Inventory and Nav Manifest
 
-Present both outputs before proceeding:
+Output both of the following, then continue immediately to Step 2:
 
 **Page Inventory:**
 
@@ -175,8 +175,8 @@ Once both outputs are complete, proceed directly to Step 2 without waiting for c
 
 ## Output
 
-1. A confirmed, numbered list of all pages with their URLs and page types.
+1. A complete, numbered list of all pages with their URLs and page types.
 2. A nav manifest capturing all three nav sections.
 
-The page inventory is passed to `skills/02-extract-page-content` for page content extraction.
-The nav manifest is used in `skills/04-generate-da-html` to generate `nav.html`.
+Continue directly to Step 2 (`skills/02-extract-page-content`) for page content extraction — do not pause or wait.
+The nav manifest is used later in Step 4 (`skills/04-generate-da-html`) to generate `nav.html`.

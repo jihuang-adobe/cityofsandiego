@@ -40,7 +40,7 @@ Run all five steps fully and automatically end-to-end. Do not pause for confirma
 
 ### Step 1 → `skills/01-discover-pages`
 Fetch the source URL. Discover and list every page in the site.
-**Output:** Confirmed page inventory before proceeding.
+**Output:** Complete page inventory. Continue immediately to Step 2.
 
 ### Step 2 → `skills/02-extract-page-content`
 For each page, fetch the HTML and extract all content section by section — neutrally,

@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Using the confirmed mapping plan and content manifest, generate one DA-compatible
+Using the mapping plan and content manifest from previous steps, generate one DA-compatible
 HTML file per page. Each file is structured exactly as DA expects — ready for upload.
 
 ---
@@ -15,12 +15,7 @@ HTML file per page. Each file is structured exactly as DA expects — ready for 
 ## When to Use
 
 - Fourth step of every secondary site migration
-- After `skills/03-map-to-blocks` has produced a confirmed mapping plan
-
-## When NOT to Use
-
-- Before the mapping plan is confirmed
-- Modifying block CSS or JS code
+- After `skills/03-map-to-blocks` has produced a complete mapping plan
 
 ---
 
@@ -671,6 +666,6 @@ DA upload paths for reference:
 - `plans` → `/plans`
 - *(and so on for each page)*
 
-All previews are passed to `skills/05-output-summary` for the migration report.
+Continue directly to Step 5 (`skills/05-output-summary`) for the migration report — do not pause or wait.
 
 **IMPORT ALL CONTENT. Partial migration is unacceptable.**

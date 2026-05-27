@@ -11,7 +11,7 @@ When asked to migrate a KP secondary site, run each skill in order. Read the
 
 ### Step 1 → `/skills/01-discover-pages/SKILL.md`
 Derive the employer slug from the source URL. Fetch the homepage, capture the
-full nav structure, and build a confirmed page inventory.
+full nav structure, and build a complete page inventory.
 
 ### Step 2 → `/skills/02-extract-page-content/SKILL.md`
 For each page in the inventory, fetch the HTML and extract all content section
