@@ -658,11 +658,19 @@ The nav has three sections — one `<div>` per section inside `<main>`.
 
 ## Output
 
-One complete, validated HTML file per page **plus** one `nav.html` file.
+Present each generated document as a **DA-ready preview in EMA** — do NOT write files
+to the filesystem or save to an output directory.
 
-Page files are named after the page path (e.g. `index.html`, `plans.html`, `support.html`).
-`nav.html` is uploaded to DA at `/fragments/nav/header` (not under the employer folder).
+One preview per page (e.g. `index`, `plans`, `getting-care`) plus one `nav` preview.
+Each preview contains the complete, validated HTML ready for the user to upload to DA
+via EMA's upload button.
 
-All files are passed to `skills/05-output-summary` for the migration report.
+DA upload paths for reference:
+- `nav` → `/fragments/nav/header`
+- `index` → `/index`
+- `plans` → `/plans`
+- *(and so on for each page)*
+
+All previews are passed to `skills/05-output-summary` for the migration report.
 
 **IMPORT ALL CONTENT. Partial migration is unacceptable.**
